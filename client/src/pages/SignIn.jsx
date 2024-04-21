@@ -1,13 +1,26 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 
 const SignIn = () => {
+  // create a formData state
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
+  // get the loading and error state from the user slice
+  const { loading, error } = useSelector((state) => state.user);
+
+  // create a navigate function
+  const navigate = useNavigate();
+  // create a dispatch function
+  const dispatch = useDispatch();
+
+  // create a handleChange function to update the formData state
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -15,10 +28,12 @@ const SignIn = () => {
     });
   };
 
+  // create a handleSubmit function to sign in the user
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // prevent the page from reloading
     try {
-      setLoading(true);
+      dispatch(signInStart()); // dispatch the signInStart action
+      // make a POST request to the server
       const res = await fetch("api/auth/signin", {
         method: "POST",
         headers: {
@@ -26,18 +41,20 @@ const SignIn = () => {
         },
         body: JSON.stringify(formData),
       });
+      // get the response data
       const data = await res.json();
+
+      // if the response is unsuccessful, dispatch the signInFailure action
       if (data.success === false) {
-        setLoading(false);
-        setError(data.message);
+        dispatch(signInFailure(data.message));
         return;
       }
-      setLoading(false);
-      setError(null);
-      navigate("/");
+      // if the response is successful, dispatch the signInSuccess action
+      dispatch(signInSuccess(data));
+      navigate("/"); // navigate to the home page
     } catch (error) {
-      setLoading(false);
-      setError(error.message);
+      // if an error occurs, dispatch the signInFailure action
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -50,7 +67,7 @@ const SignIn = () => {
           placeholder="email"
           className=" border p-3 rounded-lg"
           id="email"
-          onChange={handleChange}
+          onChange={handleChange} 
         />
         <input
           type="password"
