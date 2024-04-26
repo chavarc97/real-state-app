@@ -92,3 +92,17 @@ export const google = asyncHandler(async (req, res, next) => {
     next(error);
   }
 });
+
+// sign out user
+export const signOut = asyncHandler(async (req, res, next) => {
+
+  try {
+    // 1. clear the access_token cookie
+    res.clearCookie("access_token");
+    // 2. send a success message
+    res.status(200).json("User signed out successfully");
+  } catch (error) {
+    // 3. if an error occurs, pass it to the error handler
+    next(error);
+  }
+});
