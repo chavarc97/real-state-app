@@ -28,6 +28,9 @@ const Profile = () => {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
+  const [updateSucces, setUpdateSuccess] = useState(false);
+  const [showListingsError, setShowListingsError] = useState(false);
+  const [userListings, setUserListings] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -69,7 +72,7 @@ const Profile = () => {
 
     try {
       dispatch(updateUserStart());
-      const res = await fetch(`api/users/update/${currentUser._id}`, {
+      const res = await fetch(`/api/users/update/${currentUser._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +92,7 @@ const Profile = () => {
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`api/users/delete/${currentUser._id}`, {
+      const res = await fetch(`/api/users/delete/${currentUser._id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -106,7 +109,7 @@ const Profile = () => {
   const handleSignOut = async () => {
     try {
       dispatch(signOutStart());
-      const res = await fetch("api/auth/signout");
+      const res = await fetch("/api/auth/signout");
       const data = await res.json();
       if (data.success === false) {
         dispatch(signOutFailure(data.message));
@@ -115,6 +118,21 @@ const Profile = () => {
       dispatch(signOutSuccess(data));
     } catch (error) {
       dispatch(signOutFailure(error.message));
+    }
+  };
+
+  const handleShowListings = async () => {
+    try {
+      setShowListingsError(false);
+      const res = await fetch(`/api/users/listings/${currentUser._id}`);
+      const data = await res.json();
+      if (data.success === false) {
+        setShowListingsError(true);
+        return;
+      }
+      setUserListings(data);
+    } catch (error) {
+      setShowListingsError(true);
     }
   };
   return (
@@ -200,6 +218,52 @@ const Profile = () => {
         </span>
       </div>
       <p className="text-red-700 mt-5">{error ? error : ""}</p>
+      <p className="text-green-700 mt-5">
+        {updateSucces ? "User updated succesfully!" : ""}
+      </p>
+      <button onClick={handleShowListings} className="text-gray-700 w-full p-2 rounded-lg bg-neutral-200 hover:drop-shadow-md">
+        Show Listings
+      </button>
+      <p className="text-red-700 mt-5">
+        {showListingsError ? "Error showing listings" : ""}
+      </p>
+
+      {userListings && userListings.length > 0 && (
+        <div className="flex flex-col gap-4 border-t">
+          <h1 className="text-center mt-7 text-xl font-semibold">
+            Your Listings
+          </h1>
+          {userListings.map((listing) => (
+            <div
+              key={listing._id}
+              className="border-t rounded-lg p-3 flex justify-between items-center gap-4"
+            >
+              <Link to={`/listing/${listing._id}`}>
+                <img
+                  src={listing.imageUrls[0]}
+                  alt="listing cover"
+                  className="h-16 w-16 object-contain"
+                />
+              </Link>
+              <Link
+                className="text-slate-700 font-semibold  hover:underline truncate flex-1"
+                to={`/listing/${listing._id}`}
+              >
+                <p>{listing.name}</p>
+              </Link>
+
+              <div className="flex flex-col item-center text-xs gap-1">
+                <button className="text-red-600 uppercase p-1 rounded hover:bg-red-100">
+                  Delete
+                </button>
+                <button className="text-sky-600 uppercase p-1 rounded hover:bg-sky-100">
+                  Edit
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
