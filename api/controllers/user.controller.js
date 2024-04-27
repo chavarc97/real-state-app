@@ -1,6 +1,7 @@
 import bcryptjs from "bcryptjs";
 import asyncHandler from "express-async-handler";
 import User from "../models/user.model.js";
+import Listing from "../models/listing.model.js";
 import { errorHandler } from "../middleware/error.js";
 
 export const test = (req, res) => {
@@ -60,3 +61,21 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
     next(error);
   }
 });
+
+export const getUserListing = asyncHandler(async (req, res, next) => {
+  // 1. Check if the user params id is the same as the user id in the request
+  if (req.user.id === req.params.id){
+    try {
+      // 2. Find all listings that belong to the user
+      const listings = await Listing.find({ user: req.params.id });
+      // 3. Return the listings
+      res.status(200).json(listings);
+    } catch (error) {
+      // 4. If an error occurs, call the next middleware with the error
+      next(error);
+    }
+  } else {
+    // 5. If the user id does not match the user id in the request, return an error
+    return next(errorHandler(401, "You can only view your own listings!"));
+  }
+})
