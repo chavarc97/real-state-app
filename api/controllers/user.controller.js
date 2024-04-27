@@ -67,7 +67,7 @@ export const getUserListing = asyncHandler(async (req, res, next) => {
   if (req.user.id === req.params.id){
     try {
       // 2. Find all listings that belong to the user
-      const listings = await Listing.find({ user: req.params.id });
+      const listings = await Listing.find({ userRef: req.params.id });
       // 3. Return the listings
       res.status(200).json(listings);
     } catch (error) {
