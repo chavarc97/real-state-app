@@ -9,11 +9,9 @@ import {
   FaBed,
   FaChair,
   FaMapMarkedAlt,
-  FaMapMarkerAlt,
   FaParking,
   FaShare,
 } from "react-icons/fa";
-import { set } from "mongoose";
 
 const Listing = () => {
   SwiperCore.use([Navigation]);
