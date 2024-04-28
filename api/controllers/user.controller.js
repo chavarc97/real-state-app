@@ -64,7 +64,7 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
 
 export const getUserListing = asyncHandler(async (req, res, next) => {
   // 1. Check if the user params id is the same as the user id in the request
-  if (req.user.id === req.params.id){
+  if (req.user.id === req.params.id) {
     try {
       // 2. Find all listings that belong to the user
       const listings = await Listing.find({ userRef: req.params.id });
@@ -78,4 +78,20 @@ export const getUserListing = asyncHandler(async (req, res, next) => {
     // 5. If the user id does not match the user id in the request, return an error
     return next(errorHandler(401, "You can only view your own listings!"));
   }
-})
+});
+
+export const getUser = asyncHandler(async (req, res, next) => {
+  try {
+    // 1. find the user
+    const user = await User.findById(req.params.id);
+    // 2. if the user is not found return error
+    if (!user) return next(errorHandler(404, "User not found"));
+    // 3. destructure user and separate the password from the rest of data
+    const { password: pass, ...rest } = user.toObject();
+    // 4. send the rest of data
+    res.status(200).json(rest);
+  } catch (error) {
+    // if an error occurs send the error
+    next(error);
+  }
+});
