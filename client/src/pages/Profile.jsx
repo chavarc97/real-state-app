@@ -135,8 +135,26 @@ const Profile = () => {
       setShowListingsError(true);
     }
   };
+
+  const handleListingDelete = async (listingId) => {
+    try {
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+      setUserListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <div className="p-3 max-w-lg mx-auto">
+    <div className="p-3 max-w-lg mx-auto pb-10">
       <h1 className="text-center text-3xl font-semibold my-7">Profile</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
@@ -221,7 +239,10 @@ const Profile = () => {
       <p className="text-green-700 mt-5">
         {updateSucces ? "User updated succesfully!" : ""}
       </p>
-      <button onClick={handleShowListings} className="text-gray-700 w-full p-2 rounded-lg bg-neutral-200 hover:drop-shadow-md">
+      <button
+        onClick={handleShowListings}
+        className="text-gray-700 w-full p-2 rounded-lg bg-neutral-200 hover:drop-shadow-md"
+      >
         Show Listings
       </button>
       <p className="text-red-700 mt-5">
@@ -253,7 +274,7 @@ const Profile = () => {
               </Link>
 
               <div className="flex flex-col item-center text-xs gap-1">
-                <button className="text-red-600 uppercase p-1 rounded hover:bg-red-100">
+                <button onClick={() => handleListingDelete(listing._id)} className="text-red-600 uppercase p-1 rounded hover:bg-red-100">
                   Delete
                 </button>
                 <button className="text-sky-600 uppercase p-1 rounded hover:bg-sky-100">

@@ -11,3 +11,19 @@ export const createListing = asyncHandler(async (req, res, next) => {
         next(error);
     }
 })
+
+export const deleteListing = asyncHandler(async (req, res, next) => {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing){
+        return next(errorHandler(404, 'Listing not found 😪'))
+    }
+    if(req.user.id !== listing.userRef){
+        return next(errorHandler(401, 'You do not have permission to delete this listing'))
+    }
+    try {
+        await Listing.findByIdAndDelete(req.params.id);
+        res.status(200).json('Listing deleted successfully!')
+    } catch (error) {
+        next(error);
+    }
+})
