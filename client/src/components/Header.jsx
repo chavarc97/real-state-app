@@ -6,34 +6,38 @@ import { useEffect, useState } from "react";
 const Header = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // submit the search query
   const handleSubmit = (e) => {
     e.preventDefault();
-    const urlParams = new URLSearchParams(window.location.search)
-    urlParams.set('searchTerm', searchTerm)
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set("searchTerm", searchTerm);
     const searchQuery = urlParams.toString();
-    navigate(`/search?${searchQuery}`)
-  }
+    navigate(`/search?${searchQuery}`);
+  };
   useEffect(() => {
     // get url params
-    const urlParams = new URLSearchParams(window.location.search)
-    const searchTermFromUrl = urlParams.get('searchTerm')
-    if(searchTermFromUrl){
-      setSearchTerm(searchTermFromUrl)
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchTermFromUrl = urlParams.get("searchTerm");
+    if (searchTermFromUrl) {
+      setSearchTerm(searchTermFromUrl);
     }
-  }, [location.search])
+  }, [location.search]);
   return (
     <header className=" bg-neutral-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
         <Link to={"/"}>
           <h1 className=" font-bold text-sm sm:text-lg flex flex-wrap">
-            <span className=" text-sky-500">Demo</span>
-            <span className=" text-sky-700">State</span>
+            <img src={"/logo.svg"} alt="Your SVG Image" className=" h-5 items-center my-auto mx-2" />
+            <span className=" text-sky-500">Nest</span>
+            <span className=" text-sky-700">Quest</span>
           </h1>
         </Link>
-        <form onSubmit={handleSubmit} className="bg-neutral-100 p-3 rounded-md flex flex-wrap items-center">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-neutral-100 p-3 rounded-md flex flex-wrap items-center"
+        >
           <input
             type="text"
             placeholder="Search..."
