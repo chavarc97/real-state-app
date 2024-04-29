@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ListingItem from "../components/ListingItem";
 
 const Search = () => {
   const navigate = useNavigate();
@@ -64,11 +65,11 @@ const Search = () => {
       e.target.id === "rent" ||
       e.target.id === "sale"
     ) {
-      setSidebardata({ ...sidebardata, type: e.target.id });
+      setSideBarData({ ...sideBarData, type: e.target.id });
     }
 
     if (e.target.id === "searchTerm") {
-      setSidebardata({ ...sidebardata, searchTerm: e.target.value });
+      setSideBarData({ ...sideBarData, searchTerm: e.target.value });
     }
 
     if (
@@ -76,8 +77,8 @@ const Search = () => {
       e.target.id === "furnished" ||
       e.target.id === "offer"
     ) {
-      setSidebardata({
-        ...sidebardata,
+      setSideBarData({
+        ...sideBarData,
         [e.target.id]:
           e.target.checked || e.target.checked === "true" ? true : false,
       });
@@ -88,7 +89,7 @@ const Search = () => {
 
       const order = e.target.value.split("_")[1] || "desc";
 
-      setSidebardata({ ...sidebardata, sort, order });
+      setSideBarData({ ...sideBarData, sort, order });
     }
   };
 
@@ -96,13 +97,13 @@ const Search = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const urlParams = new URLSearchParams();
-    urlParams.set("searchTerm", sidebardata.searchTerm);
-    urlParams.set("type", sidebardata.type);
-    urlParams.set("parking", sidebardata.parking);
-    urlParams.set("furnished", sidebardata.furnished);
-    urlParams.set("offer", sidebardata.offer);
-    urlParams.set("sort", sidebardata.sort);
-    urlParams.set("order", sidebardata.order);
+    urlParams.set("searchTerm", sideBarData.searchTerm);
+    urlParams.set("type", sideBarData.type);
+    urlParams.set("parking", sideBarData.parking);
+    urlParams.set("furnished", sideBarData.furnished);
+    urlParams.set("offer", sideBarData.offer);
+    urlParams.set("sort", sideBarData.sort);
+    urlParams.set("order", sideBarData.order);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };
@@ -208,10 +209,23 @@ const Search = () => {
           </button>
         </form>
       </div>
-      <div className="">
+      <div className="flex-1">
         <h1 className="text-3xl font-semibold border-b p-3 text-slate-700 mt-5">
           Listing results:
         </h1>
+        <div className="p-7 flex flex-wrap gap-4">
+          {!loading && listings.length === 0 && (
+            <p className="text-xl text-gray-600">No listing found</p>
+          )}
+          {loading && (
+            <p className="text-xl text-gray-600 text-center w-full">
+              Loading...
+            </p>
+          )}
+          {!loading && listings && listings.map((listing) => (
+            <ListingItem key={listing._id} listing={listing} />
+          ))}
+        </div>
       </div>
     </div>
   );
